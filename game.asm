@@ -3,7 +3,7 @@
 ;;;           --------------------           ;;;
 ;;;                                          ;;;
 ;;;           Members:                       ;;;
-;;;             - Jonathan Trusdale          ;;;
+;;;             - Jonathan Trousdale          ;;;
 ;;;             - Tyler Wray                 ;;;
 ;;;             - Bekah Williams             ;;;
 ;;;             - Justin Ward                ;;;
