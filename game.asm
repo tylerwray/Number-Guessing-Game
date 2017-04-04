@@ -75,13 +75,13 @@ TOOHIGH	      	ADD R1,R3,#0		;change high value to the previous guess
 ;
 ; if correct, output a correct message and end
 ;
-CORRECT	      LEA R0,FINISH	;load finish string for output
-	      PUTS		;output finish string
-	                        ;load guessed number to R0 (in R3)
-	                        ;change from binary to ascii
-	                        ;output guessed number 
-	      LEA R0,PERIOD	;load period
-	      PUTS		;output period
+CORRECT	      LEA R0,FINISH		;load finish string for output
+	      PUTS			;output finish string
+	                        	;load guessed number to R0 (in R3)
+	                        	;change from binary to ascii
+	                        	;output guessed number 
+	      LEA R0,PERIOD		;load period
+	      PUTS			;output period
 	  	HALT
 ;
 ;;;;;;;;;;;;;;;;
