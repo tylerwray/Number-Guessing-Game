@@ -65,68 +65,7 @@ DIVISION	ADD	R5,R5,R6	; subtract 2 from the sum of high and low
 ;
 USERQUESTION	LEA 	R0,QUESTIONPRE	; Load 'Pre' Question into R0
 	        PUTS            	; Output 'Pre' Question
-		LD	R0,GUESS	; load variable GUESS into R0
-		;Ouput the current Guess TODO: Figure out how to output numbers larger than 9
-		
-	; store registries for reloading at end of routine
-
-	ST	R0,REG0		; store r0 into reg0 .blkw
-	ST	R1,REG1
-	ST	R2,REG2
-	ST	R3,REG3
-	ST	R4,REG4
-	ST	R5,REG5
-
-; Set up registries for use
-
-	LD	R0,GUESS	; Put number into r0
-	AND	R3,R3,#0	; hundreds
-	AND	R4,R4,#0	; tens
-	AND	R5,R5,#0	; ones
-
-; Figure out how many 100s and 10s there are, with 1s left over
-
-HUNDS	LD	R2,NHNDRD	; load #-100 for use (to big)
-	ADD	R0,R0,R2	; sub 100 to number for test (if there was 100 there)
-	BRn	DONE1		; branch to done because there is no 100
-	ADD	R3,R3,#1	; increment r3 (meaning there was 100 there)
-	BRnzp	HUNDS		; hard branch until other branch gets us out
-DONE1	LD	R2,HNDRD	; load #100 for use
-	ADD	R0,R0,R2	; add 100 back on (because it turns out there was no hundred there)
-
-TENS	LD	R2,NTEN		; load #-10 for use (consistancy)
-	ADD	R0,R0,R2	; sub #10 for test
-	BRn	DONE2		; branch to done because there is no 10
-	ADD	R4,R4,#1	; increment tens
-	BRnzp	TENS		; hard branch until other branch gets us out
-DONE2	LD	R2,TEN		; load #10 for use
-	ADD	R0,R0,R2	; add 10 back on
-
-	ADD	R5,R0,#0	; put whats left in r0 into r5, so we can use r0 for output
-
-; Outputing to the console
-
-	LD	R1,ASCII2	; load ascii value for 0 to be used to output
-; hundreds
-	AND	R0,R0,#0	; clear r0 for output
-	ADD	R0,R3,R1	; place hundreds in r0 
-	OUT			; output to console
-; tens
-	AND	R0,R0,#0	; clear r0 for output
-	ADD	R0,R4,R1	; place tens in r0
-	OUT			; output to console
-; ones
-	AND	R0,R0,#0	; clear r0 for output
-	ADD	R0,R5,R1	; place ones in r0
-	OUT			; output to console
-
-	LD	R0,REG0		; load registries back in before leaving
-	LD	R1,REG1
-	LD	R2,REG2
-	LD	R3,REG3
-	LD	R4,REG4
-	LD	R5,REG5
-		
+		JSR	OUTPUT	
 		LEA	R0,QUESTIONPOST	; Load the 'Post' Question
 		PUTS			; Output the 'Post' Question
 		GETC			; Get response from console
@@ -137,15 +76,16 @@ DONE2	LD	R2,TEN		; load #10 for use
 ;
 ; check to make sure user entered valid input
 ;
-		;??? what are these next few lines of code for?
-		;ST R3, USERINPUT	; Save R3 out to memory. TODO: Load the contents of R3 into R0 for output. Not sure if this works
-		;LD R0, USERINPUT	; Load R0 with the contents of R3 for output
-		;BRz CORRECT		; Branch to Correct if it is 0
-		;ADD R0, R0, R6		; Test the user input by subtracting 2 from the number
-		;BRz TOOHIGH		; If 0, means user input is 2, go to TOOHIGH
-		;BRn TOOLOW		; If negative, means user input is 1, go to TOOLOW
-		;BRp INCORRECT		; If positive, means user input was not 0, 1, or 2. Branch to incorrect input sub-routine if number is less than 0 TODO: Creat incorrect input subroutine
+VALIDINPUT	LD	R0,USERINPUT
+		LD	R1,TESTLOWER
+		ADD	R0,R0,R1	; check if less than 0
+		BRn	BADINPUT
+		LD	R0,USERINPUT
+		LD	R1,TESTUPPER
+		ADD	R0,R0,R1	; check to see if greater than 2
+		BRp	BADINPUT
 ;
+		LD	R0,USERINPUT	; load userinput to test
 		LD	R4,DECIDE	; load -1 to R4
 		ADD	R4,R4,R0	; test R4 by addition to -1 to see if they answered (0,1,2) or (low,correct,high)
 		BRn	TOOLOW		; test for too low
@@ -178,49 +118,44 @@ BADINPUT	LEA 	R0,WRONGINPUT	; Load R0 with wrong input string
 		PUTS			; Output the Incorrect String
 		BRnzp	START		; loop back to START routine	
 ;
-; if correct, output a correct message and end
 ;
-CORRECT		LEA 	R0, FINISH	; load finish string for output
-		PUTS			; output finish string
-		
-	; store registries for reloading at end of routine
-
-	ST	R0,REG0		; store r0 into reg0 .blkw
+OUTPUT	ST	R0,REG0		; store r0 into reg0 .blkw
 	ST	R1,REG1
 	ST	R2,REG2
 	ST	R3,REG3
 	ST	R4,REG4
 	ST	R5,REG5
-
+	ST	R7,REG7
+;
 ; Set up registries for use
-
+;
 	LD	R0,GUESS	; Put number into r0
 	AND	R3,R3,#0	; hundreds
 	AND	R4,R4,#0	; tens
 	AND	R5,R5,#0	; ones
-
+;
 ; Figure out how many 100s and 10s there are, with 1s left over
-
-HUNDS2	LD	R2,NHNDRD	; load #-100 for use (to big)
+;
+HUNDS	LD	R2,NHNDRD	; load #-100 for use (to big)
 	ADD	R0,R0,R2	; sub 100 to number for test (if there was 100 there)
-	BRn	DONE3		; branch to done because there is no 100
+	BRn	DONE1		; branch to done because there is no 100
 	ADD	R3,R3,#1	; increment r3 (meaning there was 100 there)
-	BRnzp	HUNDS2		; hard branch until other branch gets us out
-DONE3	LD	R2,HNDRD	; load #100 for use
+	BRnzp	HUNDS		; hard branch until other branch gets us out
+DONE1	LD	R2,HNDRD	; load #100 for use
 	ADD	R0,R0,R2	; add 100 back on (because it turns out there was no hundred there)
-
-TENS2	LD	R2,NTEN		; load #-10 for use (consistancy)
+;
+TENS	LD	R2,NTEN		; load #-10 for use (consistancy)
 	ADD	R0,R0,R2	; sub #10 for test
-	BRn	DONE4		; branch to done because there is no 10
+	BRn	DONE2		; branch to done because there is no 10
 	ADD	R4,R4,#1	; increment tens
-	BRnzp	TENS2		; hard branch until other branch gets us out
-DONE4	LD	R2,TEN		; load #10 for use
+	BRnzp	TENS		; hard branch until other branch gets us out
+DONE2	LD	R2,TEN		; load #10 for use
 	ADD	R0,R0,R2	; add 10 back on
-
+;
 	ADD	R5,R0,#0	; put whats left in r0 into r5, so we can use r0 for output
-
+;
 ; Outputing to the console
-
+;
 	LD	R1,ASCII2	; load ascii value for 0 to be used to output
 ; hundreds
 	AND	R0,R0,#0	; clear r0 for output
@@ -234,14 +169,24 @@ DONE4	LD	R2,TEN		; load #10 for use
 	AND	R0,R0,#0	; clear r0 for output
 	ADD	R0,R5,R1	; place ones in r0
 	OUT			; output to console
-
+;
 	LD	R0,REG0		; load registries back in before leaving
 	LD	R1,REG1
 	LD	R2,REG2
 	LD	R3,REG3
 	LD	R4,REG4
 	LD	R5,REG5
-		
+	LD	R7,REG7
+	RET
+;	
+; if correct, output a correct message and end
+;
+CORRECT		LEA 	R0, FINISH	; load finish string for output
+		PUTS			; output finish string
+		JSR	OUTPUT
+		LEA	R0,PERIOD
+		PUTS
+;
 		HALT
 ;
 ;;;;;;;;;;;;;;;;
@@ -261,22 +206,22 @@ NEGONE	.FILL	#-1
 ASCII	.FILL	#-48
 TESTLOWER	.FILL	#0
 TESTUPPER	.FILL	#-2
-
+;
 ASCII2	.FILL	#48	; Zero in ascii
 NUMBER	.FILL	#999	; test number
-
+;
 NHNDRD	.FILL	#-100	; neg one hundred for test
 HNDRD	.FILL	#100	; one hundred for test
 NTEN	.FILL	#-10
 TEN	.FILL	#10
-
+;
 REG0	.BLKW	1	; To restore the registers
 REG1	.BLKW	1
 REG2	.BLKW	1
 REG3	.BLKW	1
 REG4	.BLKW	1
 REG5	.BLKW	1
-
+REG7	.BLKW	1
 QUESTIONPRE .STRINGZ "\nIs "
 QUESTIONPOST .STRINGZ " your number? (0 = low, 1 = correct, 2 = high): "
 WRONGINPUT .STRINGZ "ERROR: That is not a valid input.\nPlease try again.\n"
