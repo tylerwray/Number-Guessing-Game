@@ -16,13 +16,14 @@
 ; of steps.
 ;
 ; ****** Register Map ******
+; note that this is just a general key to use, variables are stored
 ; R0 = Input/Output
 ; R1 = High (100, Can't ever change)
 ; R2 = Low (0, Can't ever change)
 ; R3 = Guess
 ; R4 = Decide
 ; R5 = High + Low
-; R6 = 2 (Can't ever change)
+; R6 = 2
 ; counter placed in R3
 ;
 	.ORIG x3000
@@ -98,9 +99,9 @@ TOOLOW	      	LD	R3,GUESS	; load GUESS into R3
 		LD	R2,LOW		; load LOW into R2
 		ADD 	R2,R3,#0	; change low value to the previous guess
 		ST	R2,LOW		; store number in R2 in variable LOW
-	     	AND R3,R3,#0		; clear R3 for iteration
-	      	AND R5,R5,#0		; clear R5 for iteration
-	     	BRnzp START		; go to start
+	     	AND 	R3,R3,#0		; clear R3 for iteration
+	      	AND 	R5,R5,#0		; clear R5 for iteration
+	     	BRnzp 	START		; go to start
 ;
 ; if too high, change high to guess or R1 = R3
 ;
