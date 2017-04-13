@@ -39,6 +39,10 @@ CLEAR		AND	R0,R0,#0
 		AND	R6,R6,#0
 		AND	R7,R7,#0
 ;
+; tell user about the game
+;
+		LEA	R0,EXPLANATION	; load string
+		PUTS			; output string
 ; Entry point for the program, Sets R1 = 100 and R2 = 0
 ;
 		LD	R1,HUNDRED	; set R1 to 100 for first run through
@@ -222,6 +226,8 @@ REG3	.BLKW	1
 REG4	.BLKW	1
 REG5	.BLKW	1
 REG7	.BLKW	1
+;
+EXPLANATION .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100. The computer\nwill try to guess it.\n"
 QUESTIONPRE .STRINGZ "\nIs "
 QUESTIONPOST .STRINGZ " your number? (0 = low, 1 = correct, 2 = high): "
 WRONGINPUT .STRINGZ "ERROR: That is not a valid input.\nPlease try again.\n"
