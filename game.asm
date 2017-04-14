@@ -194,14 +194,6 @@ O	AND	R0,R0,#0	; clear r0 for output
 	LD	R7,REG7		; load back to PC counter to return to if ever changed
 
 	RET			; use if used as a function in a program
-
-; New line function
-
-NEWLINE	ST	R7,newLineReg7
-	LEA	R0,return	; to output a new line character
-	PUTs			; outputing \n (nukes my r7, thats why I need to store it)
-	LD	R7,newLineReg7
-	RET
 ;
 ; if correct, output a correct message and end
 ;
