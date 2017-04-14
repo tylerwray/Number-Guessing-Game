@@ -40,7 +40,9 @@ CLEAR		AND	R0,R0,#0
 		AND	R7,R7,#0
 ;
 ; tell user about the game
-BEGIN	JSR	EXPLAIN
+;
+		LEA	R0,EXPLANATION	; load string
+		PUTS			; output string
 ; Entry point for the program, Sets R1 = 100 and R2 = 0
 ;
 		LD	R1,HUNDRED	; set R1 to 100 for first run through
@@ -120,9 +122,8 @@ BADINPUT	LEA 	R0,WRONGINPUT	; Load R0 with wrong input string
 		PUTS			; Output the Incorrect String
 		BRnzp	START		; loop back to START routine	
 ;
-;
 ; Outputing a int between 0 & 999
-
+;
 ; store registries for reloading at end of routine
 
 OUTPUT	ST	R0,REG0		; store r0 into reg0 .blkw
@@ -136,7 +137,7 @@ OUTPUT	ST	R0,REG0		; store r0 into reg0 .blkw
 
 ; Set up registries for use
 
-	;LD	R0,NUMBER	; Put number into r0
+	LD	R0,GUESS	; Put number into r0
 	AND	R3,R3,#0	; hundreds
 	AND	R4,R4,#0	; tens
 	AND	R5,R5,#0	; ones
@@ -194,12 +195,13 @@ O	AND	R0,R0,#0	; clear r0 for output
 	LD	R7,REG7		; load back to PC counter to return to if ever changed
 
 	RET			; use if used as a function in a program
-;
+;	
 ; if correct, output a correct message and end
 ;
 CORRECT		LEA 	R0, FINISH	; load finish string for output
 		PUTS			; output finish string
 		JSR	OUTPUT
+		PERIOD	.STRINGZ "."
 		LEA	R0,PERIOD
 		PUTS
 ;
@@ -225,7 +227,6 @@ TESTUPPER	.FILL	#-2
 ;
 ASCII2	.FILL	#48	; Zero in ascii
 NUMBER	.FILL	#999	; test number
-return	.STRINGZ	"\n"
 ;
 NHNDRD	.FILL	#-100	; neg one hundred for test
 HNDRD	.FILL	#100	; one hundred for test
@@ -240,14 +241,13 @@ REG4	.BLKW	1
 REG5	.BLKW	1
 REG6	.BLKW	1
 REG7	.BLKW	1
-newLineReg7	.BLKW	1
 ;
-EXPLAIN .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100.\nThe computer nwill try to guess it.\n"
+EXPLANATION .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100. The computer\nwill try to guess it.\n"
 QUESTIONPRE .STRINGZ "\nIs "
 QUESTIONPOST .STRINGZ " your number? (0 = low, 1 = correct, 2 = high): "
 WRONGINPUT .STRINGZ "ERROR: That is not a valid input.\nPlease try again.\n"
 FINISH	.STRINGZ "\nYay, we guessed your number!\nYour number was "
-PERIOD	.STRINGZ "."
+;PERIOD	.STRINGZ "."		; Commented out because it was moved up to where it was called because we ran out of pcoffset distance
 ;
   .END
 ;
