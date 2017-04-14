@@ -121,23 +121,28 @@ BADINPUT	LEA 	R0,WRONGINPUT	; Load R0 with wrong input string
 		BRnzp	START		; loop back to START routine	
 ;
 ;
+; Outputing a int between 0 & 999
+
+; store registries for reloading at end of routine
+
 OUTPUT	ST	R0,REG0		; store r0 into reg0 .blkw
 	ST	R1,REG1
 	ST	R2,REG2
 	ST	R3,REG3
 	ST	R4,REG4
 	ST	R5,REG5
-	ST	R7,REG7
-;
+	ST	R6,REG6
+	ST	R7,REG7		; PC counter to return to
+
 ; Set up registries for use
-;
-	LD	R0,GUESS	; Put number into r0
+
+	;LD	R0,NUMBER	; Put number into r0
 	AND	R3,R3,#0	; hundreds
 	AND	R4,R4,#0	; tens
 	AND	R5,R5,#0	; ones
-;
-; Figure out how many 100s and 10s there are, with 1s left over
-;
+
+; Figure out how many 100's and 10's there are, with 1's left over
+
 HUNDS	LD	R2,NHNDRD	; load #-100 for use (to big)
 	ADD	R0,R0,R2	; sub 100 to number for test (if there was 100 there)
 	BRn	DONE1		; branch to done because there is no 100
@@ -145,7 +150,7 @@ HUNDS	LD	R2,NHNDRD	; load #-100 for use (to big)
 	BRnzp	HUNDS		; hard branch until other branch gets us out
 DONE1	LD	R2,HNDRD	; load #100 for use
 	ADD	R0,R0,R2	; add 100 back on (because it turns out there was no hundred there)
-;
+
 TENS	LD	R2,NTEN		; load #-10 for use (consistancy)
 	ADD	R0,R0,R2	; sub #10 for test
 	BRn	DONE2		; branch to done because there is no 10
@@ -153,39 +158,49 @@ TENS	LD	R2,NTEN		; load #-10 for use (consistancy)
 	BRnzp	TENS		; hard branch until other branch gets us out
 DONE2	LD	R2,TEN		; load #10 for use
 	ADD	R0,R0,R2	; add 10 back on
-;
-	ADD	R5,R0,#0	; put whats left in r0 into r5, so we can use r0 for output
-;
+
+ONES	ADD	R5,R0,#0	; put whats left in r0 into r5, so we can use r0 for output
+
 ; Outputing to the console
-;
+
 	LD	R1,ASCII2	; load ascii value for 0 to be used to output
 ; hundreds
-	AND	R0,R0,#0	; clear r0 for output
-	ADD	R0,R3,R1	; place hundreds in r0 
+H	AND	R0,R0,#0	; clear r0 for output
+	ADD	R0,R3,#0	; place hundreds in r0
+	BRz	T		; dont display if it was 0
+	ADD	R0,R0,R1	; load ascii offeset
 	OUT			; output to console
+	ADD	R6,R6,#1	; set flag for use of significant digit
 ; tens
-	AND	R0,R0,#0	; clear r0 for output
-	ADD	R0,R4,R1	; place tens in r0
+T	AND	R0,R0,#0	; clear r0 for output
+	ADD	R0,R4,#0	; place tens in r0
+	BRnp	chck
+	ADD	R6,R6,#0	; update the flag
+	BRnz	O		; if signficant digit flag is not set (meaning no hundreds) then check for zero in tens place
+chck	ADD	R0,R0,R1	; ascii offset
 	OUT			; output to console
 ; ones
-	AND	R0,R0,#0	; clear r0 for output
-	ADD	R0,R5,R1	; place ones in r0
+O	AND	R0,R0,#0	; clear r0 for output
+	ADD	R0,R5,R1	; place ones in r0, also adding ascii here
 	OUT			; output to console
-;
+
 	LD	R0,REG0		; load registries back in before leaving
 	LD	R1,REG1
 	LD	R2,REG2
 	LD	R3,REG3
 	LD	R4,REG4
 	LD	R5,REG5
-	LD	R7,REG7
-	RET
-;
-;
-EXPLAIN	ST	R7,REG7
-	LEA	R0,EXPLANATION	; load string
-	PUTS			; output string
-	LD	R7,REG7
+	LD	R6,REG6
+	LD	R7,REG7		; load back to PC counter to return to if ever changed
+
+	RET			; use if used as a function in a program
+
+; New line function
+
+NEWLINE	ST	R7,newLineReg7
+	LEA	R0,return	; to output a new line character
+	PUTs			; outputing \n (nukes my r7, thats why I need to store it)
+	LD	R7,newLineReg7
 	RET
 ;
 ; if correct, output a correct message and end
@@ -218,6 +233,7 @@ TESTUPPER	.FILL	#-2
 ;
 ASCII2	.FILL	#48	; Zero in ascii
 NUMBER	.FILL	#999	; test number
+return	.STRINGZ	"\n"
 ;
 NHNDRD	.FILL	#-100	; neg one hundred for test
 HNDRD	.FILL	#100	; one hundred for test
@@ -230,7 +246,9 @@ REG2	.BLKW	1
 REG3	.BLKW	1
 REG4	.BLKW	1
 REG5	.BLKW	1
+REG6	.BLKW	1
 REG7	.BLKW	1
+newLineReg7	.BLKW	1
 ;
 EXPLAIN .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100.\nThe computer nwill try to guess it.\n"
 QUESTIONPRE .STRINGZ "\nIs "
