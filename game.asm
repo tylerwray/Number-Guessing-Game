@@ -40,9 +40,7 @@ CLEAR		AND	R0,R0,#0
 		AND	R7,R7,#0
 ;
 ; tell user about the game
-;
-		LEA	R0,EXPLANATION	; load string
-		PUTS			; output string
+BEGIN	JSR	EXPLAIN
 ; Entry point for the program, Sets R1 = 100 and R2 = 0
 ;
 		LD	R1,HUNDRED	; set R1 to 100 for first run through
@@ -182,7 +180,14 @@ DONE2	LD	R2,TEN		; load #10 for use
 	LD	R5,REG5
 	LD	R7,REG7
 	RET
-;	
+;
+;
+EXPLAIN	ST	R7,REG7
+	LEA	R0,EXPLANATION	; load string
+	PUTS			; output string
+	LD	R7,REG7
+	RET
+;
 ; if correct, output a correct message and end
 ;
 CORRECT		LEA 	R0, FINISH	; load finish string for output
@@ -227,7 +232,7 @@ REG4	.BLKW	1
 REG5	.BLKW	1
 REG7	.BLKW	1
 ;
-EXPLANATION .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100. The computer\nwill try to guess it.\n"
+EXPLAIN .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100.\nThe computer nwill try to guess it.\n"
 QUESTIONPRE .STRINGZ "\nIs "
 QUESTIONPOST .STRINGZ " your number? (0 = low, 1 = correct, 2 = high): "
 WRONGINPUT .STRINGZ "ERROR: That is not a valid input.\nPlease try again.\n"
