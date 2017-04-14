@@ -141,6 +141,7 @@ OUTPUT	ST	R0,REG0		; store r0 into reg0 .blkw
 	AND	R3,R3,#0	; hundreds
 	AND	R4,R4,#0	; tens
 	AND	R5,R5,#0	; ones
+	AND	R6,R6,#0	; hundreds flag
 
 ; Figure out how many 100's and 10's there are, with 1's left over
 
