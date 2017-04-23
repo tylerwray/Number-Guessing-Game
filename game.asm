@@ -88,7 +88,6 @@ VALIDINPUT	LD	R0,USERINPUT
 		LD	R1,TESTUPPER
 		ADD	R0,R0,R1	; check to see if greater than 2
 		BRp	BADINPUT
-;
 		LD	R0,USERINPUT	; load userinput to test
 		LD	R4,DECIDE	; load -1 to R4
 		ADD	R4,R4,R0	; test R4 by addition to -1 to see if they answered (0,1,2) or (low,correct,high)
@@ -99,16 +98,30 @@ VALIDINPUT	LD	R0,USERINPUT
 ; if too low, change low to guess or R2 = R3
 ;
 TOOLOW	      	LD	R3,GUESS	; load GUESS into R3
+		AND	R0, R0, #0	; Clear R0
+		LD	R1,HIGH		; Load High into R1
+		NOT	R1, R1		; Negate HIGH
+		ADD	R1, R1, #1	; Negate HIGH
+		ADD	R0, R1, R2	; Get difference between HIGH and LOW
+		ADD	R0, R0, #1	; Add 1 to test
+		BRz	CHEATED		; Branch to Cheated
 		LD	R2,LOW		; load LOW into R2
 		ADD 	R2,R3,#0	; change low value to the previous guess
 		ST	R2,LOW		; store number in R2 in variable LOW
-	     	AND 	R3,R3,#0		; clear R3 for iteration
-	      	AND 	R5,R5,#0		; clear R5 for iteration
+	     	AND 	R3,R3,#0	; clear R3 for iteration
+	      	AND 	R5,R5,#0	; clear R5 for iteration
 	     	BRnzp 	START		; go to start
 ;
 ; if too high, change high to guess or R1 = R3
 ;
 TOOHIGH	      	LD	R3,GUESS	; load GUESS into R3
+		AND	R0, R0, #0	; Clear R0
+		LD	R1,HIGH		; Load High into R1
+		NOT	R1, R1		; Negate HIGH
+		ADD	R1, R1, #1	; Negate HIGH
+		ADD	R0, R1, R2	; Get difference between HIGH and LOW
+		ADD	R0, R0, #2	; Add two to check for cheating
+		BRz	CHEATED		; Branch to Cheated
 		LD	R1,HIGH		; load HIGH into R1
 		ADD 	R1,R3,#0	; change high value to the previous guess
 		ST	R1,HIGH		; store number in R1 in variable HIGH
@@ -122,7 +135,7 @@ BADINPUT	LEA 	R0,WRONGINPUT	; Load R0 with wrong input string
 		PUTS			; Output the Incorrect String
 		BRnzp	START		; loop back to START routine	
 ;
-; Outputing a int between 0 & 999
+; Outputing an int between 0 & 999
 ;
 ; store registries for reloading at end of routine
 
@@ -165,7 +178,7 @@ ONES	ADD	R5,R0,#0	; put whats left in r0 into r5, so we can use r0 for output
 
 ; Outputing to the console
 
-	LD	R1,ASCII2	; load ascii value for 0 to be used to output
+	LD	R1,ASCII2	; load ascii value for 0 to be used to outputl,m 
 ; hundreds
 H	AND	R0,R0,#0	; clear r0 for output
 	ADD	R0,R3,#0	; place hundreds in r0
@@ -205,7 +218,10 @@ CORRECT		LEA 	R0, FINISH	; load finish string for output
 		PERIOD	.STRINGZ "."
 		LEA	R0,PERIOD
 		PUTS
+		HALT
 ;
+CHEATED		LEA	R0, USERCHEATED		; Output the user cheated string
+		PUTS
 		HALT
 ;
 ;;;;;;;;;;;;;;;;
@@ -243,12 +259,12 @@ REG5	.BLKW	1
 REG6	.BLKW	1
 REG7	.BLKW	1
 ;
-EXPLANATION .STRINGZ "Number Guessing Game\nThink of a number between 1 and 100. The computer\nwill try to guess it.\n"
+EXPLANATION .STRINGZ "------- Number Guessing Game -------\nThink of a number between 1-100\n"
 QUESTIONPRE .STRINGZ "\nIs "
 QUESTIONPOST .STRINGZ " your number? (0 = low, 1 = correct, 2 = high): "
 WRONGINPUT .STRINGZ "ERROR: That is not a valid input.\nPlease try again.\n"
 FINISH	.STRINGZ "\nYay, we guessed your number!\nYour number was "
-;PERIOD	.STRINGZ "."		; Commented out because it was moved up to where it was called because we ran out of pcoffset distance
+USERCHEATED .STRINGZ "\nWe couldn't guess your number, please try again.\n"
 ;
   .END
 ;
