@@ -120,7 +120,7 @@ TOOHIGH	      	LD	R3,GUESS	; load GUESS into R3
 		NOT	R1, R1		; Negate HIGH
 		ADD	R1, R1, #1	; Negate HIGH
 		ADD	R0, R1, R2	; Get difference between HIGH and LOW
-		ADD	R0, R0, #2	; Add two to check for cheating
+		ADD	R0, R0, #1	; Add two to check for cheating
 		BRz	CHEATED		; Branch to Cheated
 		LD	R1,HIGH		; load HIGH into R1
 		ADD 	R1,R3,#0	; change high value to the previous guess
@@ -259,12 +259,12 @@ REG5	.BLKW	1
 REG6	.BLKW	1
 REG7	.BLKW	1
 ;
-EXPLANATION .STRINGZ "------- Number Guessing Game -------\nThink of a number between 1-100\n"
+FINISH	.STRINGZ "\nYay, we guessed your number!\nYour number was "
 QUESTIONPRE .STRINGZ "\nIs "
 QUESTIONPOST .STRINGZ " your number? (0 = low, 1 = correct, 2 = high): "
 WRONGINPUT .STRINGZ "ERROR: That is not a valid input.\nPlease try again.\n"
-FINISH	.STRINGZ "\nYay, we guessed your number!\nYour number was "
-USERCHEATED .STRINGZ "\nWe couldn't guess your number, please try again.\n"
+USERCHEATED .STRINGZ "\nYou cheated!\n"
+EXPLANATION .STRINGZ "------- Number Guessing Game -------\nThink of a number between 1-100\n"
 ;
   .END
 ;
