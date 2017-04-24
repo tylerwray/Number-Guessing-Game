@@ -116,7 +116,7 @@ TOOLOW	      	LD	R3,GUESS	; load GUESS into R3
 ;
 TOOHIGH	      	LD	R3,GUESS	; load GUESS into R3
 		AND	R0, R0, #0	; Clear R0
-		LD	R1,HIGH		; Load High into R1
+		LD	R1, HIGH	; Load High into R1
 		NOT	R1, R1		; Negate HIGH
 		ADD	R1, R1, #1	; Negate HIGH
 		ADD	R0, R1, R2	; Get difference between HIGH and LOW
@@ -133,7 +133,7 @@ TOOHIGH	      	LD	R3,GUESS	; load GUESS into R3
 ;
 BADINPUT	LEA 	R0,WRONGINPUT	; Load R0 with wrong input string
 		PUTS			; Output the Incorrect String
-		BRnzp	START		; loop back to START routine	
+		BRnzp	USERQUESTION	; loop back to START routine	
 ;
 ; Outputing an int between 0 & 999
 ;
